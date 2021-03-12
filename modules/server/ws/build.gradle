@@ -1,0 +1,62 @@
+static String getSysProp(String value, String fallback) {
+    // This is required as there is a length limitation on System.properties.getProperty(a,b)
+
+    if (!System.properties.containsKey(value)) {
+        return fallback
+    }
+
+    return System.properties.get(value)
+}
+
+import java.nio.file.Paths
+
+def modType = 'ws'
+def modId = "vbox-${gradle.vboxVersion}-${modType}"
+
+apply plugin: 'java'
+
+sourceSets {
+    testIntegration {
+        compileClasspath += sourceSets.test.compileClasspath
+        runtimeClasspath += sourceSets.test.runtimeClasspath
+    }
+}
+
+configurations {
+    testIntegrationCompile.extendsFrom testCompile
+    testIntegrationRuntime.extendsFrom testRuntime
+}
+
+dependencies {
+    compileOnly 'io.kamax:hbox-server-api:0.0.15'
+    compileOnly files("lib/vboxj${modType}.jar")
+    compile project(":hbox-vbox-${gradle.vboxVersion}-server-core")
+
+    testCompile 'junit:junit:4.12'
+    testCompile 'io.kamax:hbox-server-api-test:0.0.15'
+}
+
+task testIntegration(type: Test) {
+    description = "Integration tests which require a VirtualBox installation"
+    classpath = sourceSets.testIntegration.runtimeClasspath
+    testClassesDirs = sourceSets.testIntegration.output.classesDirs
+}
+
+def binPath = Paths.get(getSysProp("server.build.bin.modules", project.buildDir.toPath().resolve('bin').toString()))
+def jarPath = binPath.resolve(modId)
+
+task distBinJar(type: Copy) {
+    from jar
+    from project.file("lib/vboxj${modType}.jar")
+    from configurations.compile
+    into jarPath
+}
+
+task distBinMeta(type: Copy) {
+    from project.file("src/package/${modId}.xml")
+    into binPath
+}
+
+task distBin {
+    dependsOn distBinJar, distBinMeta
+}

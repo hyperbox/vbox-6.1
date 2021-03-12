@@ -1,0 +1,38 @@
+apply plugin: 'base'
+apply plugin: 'idea'
+
+String gitVersion() {
+    ByteArrayOutputStream out = new ByteArrayOutputStream()
+    exec {
+        commandLine = [ 'git', 'describe', '--always', '--dirty' ]
+        standardOutput = out
+    }
+    return out.toString().replace(System.lineSeparator(), '')
+}
+
+evaluationDependsOnChildren()
+
+subprojects {
+    apply plugin: 'java'
+
+    sourceCompatibility = 1.7
+    targetCompatibility = 1.8
+
+    group = 'io.kamax'
+    version = gitVersion()
+
+    repositories {
+        maven { url "https://maven.kamax.io/releases/" }
+        maven { url "https://maven.kamax.io/snapshots/" }
+        mavenLocal()
+        mavenCentral()
+    }
+}
+
+task distBinLinux() {
+    // placeholder
+}
+
+task distBinWin() {
+    // placeholder
+}
