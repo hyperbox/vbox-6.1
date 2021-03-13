@@ -42,12 +42,12 @@ public class Accelerate2dVideoSettingAction implements _MachineSettingAction {
 
     @Override
     public void set(IMachine machine, _Setting setting) {
-        machine.setAccelerate2DVideoEnabled(((BooleanSetting) setting).getValue());
+        machine.getGraphicsAdapter().setAccelerate2DVideoEnabled(((BooleanSetting) setting).getValue());
     }
 
     @Override
     public _Setting get(IMachine machine) {
-        return new Accelerate2dVideoSetting(machine.getAccelerate2DVideoEnabled());
+        return new Accelerate2dVideoSetting(machine.getGraphicsAdapter().getAccelerate2DVideoEnabled());
     }
 
 }

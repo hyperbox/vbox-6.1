@@ -42,12 +42,12 @@ public class MonitorCountSettingAction implements _MachineSettingAction {
 
     @Override
     public void set(IMachine machine, _Setting setting) {
-        machine.setMonitorCount(((PositiveNumberSetting) setting).getValue());
+        machine.getGraphicsAdapter().setMonitorCount(((PositiveNumberSetting) setting).getValue());
     }
 
     @Override
     public _Setting get(IMachine machine) {
-        return new MonitorCountSetting(machine.getMonitorCount());
+        return new MonitorCountSetting(machine.getGraphicsAdapter().getMonitorCount());
     }
 
 }

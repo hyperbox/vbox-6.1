@@ -42,12 +42,12 @@ public class VramSettingAction implements _MachineSettingAction {
 
     @Override
     public void set(IMachine machine, _Setting setting) {
-        machine.setVRAMSize(((PositiveNumberSetting) setting).getValue());
+        machine.getGraphicsAdapter().setVRAMSize(((PositiveNumberSetting) setting).getValue());
     }
 
     @Override
     public _Setting get(IMachine machine) {
-        return new VRamSetting(machine.getVRAMSize());
+        return new VRamSetting(machine.getGraphicsAdapter().getVRAMSize());
     }
 
 }

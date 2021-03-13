@@ -42,12 +42,12 @@ public class Accelerate3dSettingAction implements _MachineSettingAction {
 
     @Override
     public void set(IMachine machine, _Setting setting) {
-        machine.setAccelerate3DEnabled(((BooleanSetting) setting).getValue());
+        machine.getGraphicsAdapter().setAccelerate3DEnabled(((BooleanSetting) setting).getValue());
     }
 
     @Override
     public _Setting get(IMachine machine) {
-        return new Accelerate3dSetting(machine.getAccelerate3DEnabled());
+        return new Accelerate3dSetting(machine.getGraphicsAdapter().getAccelerate3DEnabled());
     }
 
 }

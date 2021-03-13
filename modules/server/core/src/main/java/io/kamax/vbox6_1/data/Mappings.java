@@ -71,7 +71,6 @@ public class Mappings {
         mappingMachine.put(MachineStates.Teleporting, MachineState.Teleporting);
         mappingMachine.put(MachineStates.TeleportingPaused, MachineState.TeleportingPausedVM);
         mappingMachine.put(MachineStates.TeleportingIn, MachineState.TeleportingIn);
-        mappingMachine.put(MachineStates.FaultTolerantSyncing, MachineState.FaultTolerantSyncing);
         mappingMachine.put(MachineStates.SnapshotLive, MachineState.LiveSnapshotting);
         mappingMachine.put(MachineStates.SnapshotDeletingOnline, MachineState.DeletingSnapshotOnline);
         mappingMachine.put(MachineStates.SnapshotDeletingPaused, MachineState.DeletingSnapshotPaused);
