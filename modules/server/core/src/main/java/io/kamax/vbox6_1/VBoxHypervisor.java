@@ -178,8 +178,9 @@ public abstract class VBoxHypervisor implements _Hypervisor {
             stop();
             throw e;
         } catch (Throwable t) {
+            Logger.exception(t);
             stop();
-            throw new HyperboxException("Failed to connect", t);
+            throw new HyperboxException("Failed to connect: " + t.getMessage(), t);
         }
     }
 
