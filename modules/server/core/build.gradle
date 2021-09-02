@@ -3,5 +3,5 @@ apply plugin: 'java'
 dependencies {
     compileOnly files('lib/vboxjws.jar')
     compileOnly 'io.kamax:hbox-server-api:0.0.15'
-    compile 'io.kamax:hbox-vbox-common-server:0.1.4'
+    compile 'io.kamax:hbox-vbox-common-server:0.1.5'
 }
