@@ -1,38 +1,121 @@
-apply plugin: 'base'
-apply plugin: 'idea'
+/*
+ * Hyperbox - Virtual Infrastructure Manager
+ * Copyright (C) 2021 Max Dor
+ *
+ * https://apps.kamax.io/hyperbox
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
-String gitVersion() {
-    ByteArrayOutputStream out = new ByteArrayOutputStream()
-    exec {
-        commandLine = [ 'git', 'describe', '--always', '--dirty' ]
-        standardOutput = out
+import java.nio.file.Paths
+import java.util.regex.Pattern
+
+String buildVersion() {
+    def versionPattern = Pattern.compile("v(\\d+\\.)?(\\d+\\.)?(\\d+)(-.*)?")
+
+    String version = System.getenv('HBOX_VBOX6_1_BUILD_VERSION')
+    if (version == null || version.length() == 0) {
+        version = sourceVersion()
     }
+    return versionPattern.matcher(version).matches() ? version.substring(1) : version
+}
+
+String sourceVersion() {
+    String version = System.getenv('HBOX_VBOX6_1_BUILD_VERSION')
+    if (version != null && version.length() > 0) {
+        return version
+    }
+
+    ByteArrayOutputStream out = new ByteArrayOutputStream()
+
+    def o = exec {
+        commandLine = ['git', 'describe', '--tags', '--always', '--dirty']
+        standardOutput = out
+        errorOutput = out
+        ignoreExitValue = true
+    }
+
+    if (o.exitValue != 0) {
+        if (o.exitValue != 128) {
+            logger.lifecycle("Unable to determine git version: {}", out)
+        }
+
+        return "UNKNOWN"
+    }
+
     return out.toString().replace(System.lineSeparator(), '')
 }
 
-evaluationDependsOnChildren()
+static String getSysProp(String value, Object fallback) {
+    // This is required as there is a length limitation on System.properties.getProperty(a,b)
 
-subprojects {
-    apply plugin: 'java'
+    if (!System.properties.containsKey(value)) {
+        return fallback.toString()
+    }
 
-    sourceCompatibility = 1.7
-    targetCompatibility = 1.8
+    return System.properties.get(value)
+}
 
-    group = 'io.kamax'
-    version = gitVersion()
+apply plugin: 'java'
 
-    repositories {
-        maven { url "https://maven.kamax.io/releases/" }
-        maven { url "https://maven.kamax.io/snapshots/" }
-        mavenLocal()
-        mavenCentral()
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+group = 'io.kamax.apps.hbox'
+version = buildVersion()
+
+/*
+sourceSets {
+    testIntegration {
+        compileClasspath += sourceSets.test.compileClasspath
+        runtimeClasspath += sourceSets.test.runtimeClasspath
+    }
+}
+*/
+configurations {
+    testIntegrationCompile.extendsFrom testCompile
+    testIntegrationRuntime.extendsFrom testRuntime
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+configurations {
+    // Create a dedicated resolvable configuration to package all the required libs and filter out only the
+    // hyperbox-related APIs
+    distLib.extendsFrom implementation
+}
+
+dependencies {
+    implementation 'io.kamax.apps.hbox:hbox-server-api:0.0.17'
+    implementation files('lib/vboxjws.jar')
+
+    testImplementation 'junit:junit:4.13.2'
+}
+
+tasks.register('assembleDist') {
+    dependsOn 'assemble'
+
+    doLast {
+        copy {
+            from 'build/libs'
+            from 'lib/vboxjws.jar'
+            into 'build/dist'
+        }
     }
 }
 
-task distBinLinux() {
-    // placeholder
-}
-
-task distBinWin() {
-    // placeholder
-}
+tasks.getByName('build').dependsOn 'assembleDist'

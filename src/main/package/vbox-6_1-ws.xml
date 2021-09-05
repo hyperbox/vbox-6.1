@@ -1,0 +1,15 @@
+<module>
+    <id>%ID%</id>
+    <path>%LIB_DIR%</path>
+    <name>Virtualbox 6.1 WebService Connector</name>
+    <desc>This module provides the WebServices connector for VirtualBox 6.1</desc>
+    <version>%VERSION%</version>
+    <vendor>Kamax.io</vendor>
+    <url>https://apps.kamax.io/hyperbox</url>
+    <providers>
+        <provider>
+            <type>io.kamax.hboxd.hypervisor._Hypervisor</type>
+            <impl>VBoxWebServicesHypervisor</impl>
+        </provider>
+    </providers>
+</module>
